@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta charset="utf-8">
+        <title>Puzzle Game</title>
+        <script>
+        var pzl;
+        window.onload = function canvas() {
+            var size = 3;
+
+            var sx,sy,sWidth,sHeigth;
+            var dx,dy,dWidth,dHeigth;
+            sx=0;
+            sy=0;
+            sWidth  = 512/size;
+            sHeigth = 512/size;
+            dx=0;
+            dy=0;
+            dWidth  = 160;
+            dHeigth = 160;
+
+            pzl = new Array(size);
+            for(var i=0;i<size;i++)
+              pzl[i] = new Array(size);
+
+            for(var i=0;i<size;i++){
+                for(var j=0;j<size;j++)
+                    pzl[i][j] = new Object;
+            }
+
+            var cv = document.getElementById("canvas");
+            var ctx = cv.getContext("2d");
+            var img = document.getElementById("scream");
+            var count=1;
+            for(var i=0;i<size;i++){
+                for(var j=0;j<size;j++){
+                    if(i==size-1&&j==size-1){
+
+                        pzl[i][j].order = count++;
+                        break;
+                    }
+                    pzl[i][j].sx = j*dWidth;;
+                    pzl[i][j].sy = i*dHeigth;;
+                    pzl[i][j].sw = dWidth;
+                    pzl[i][j].sh = dHeigth;
+                    pzl[i][j].order = count++;
+                }
+            }
+
+            for(var i=0;i<100;i++){
+                var x1 = Math.floor(Math.random()*3);
+                var y1 = Math.floor(Math.random()*3);
+                var x2 = Math.floor(Math.random()*3);
+                var y2 = Math.floor(Math.random()*3);
+                change(x1,y1,x2,y2,size);
+            }
+
+            for(var i=0;i<size;i++){
+                for(var j=0;j<size;j++){
+                    pzl[i][j].dx = j*dWidth;;
+                    pzl[i][j].dy = i*dHeigth;
+                    pzl[i][j].dw = dWidth;
+                    pzl[i][j].dh = dHeigth;
+                }
+            }
+
+            for (var i=0;i<size;i++){
+                for(var j=0;j<size;j++){
+                    ctx.drawImage(img,pzl[i][j].sx,pzl[i][j].sy,pzl[i][j].sw,pzl[i][j].sh,
+                                      pzl[i][j].dx,pzl[i][j].dy,pzl[i][j].dw,pzl[i][j].dh);
+                }
+            }
+            var temp = new Object;
+            cv.addEventListener("click",function(evt){
+                var mousePos = getMouseClickPos(cv,evt);
+                var mx = mousePos.x;
+                var my = mousePos.y;
+                var ii,jj;
+                for(var i=0;i<size;i++){
+                    for(var j=0;j<size;j++){
+                        if(  pzl[i][j].dx < mx && mx < (pzl[i][j].dx+pzl[i][j].dw)   ){
+                            if(  pzl[i][j].dy < my && my < (pzl[i][j].dy+pzl[i][j].dh)   ){
+                                ii = i;
+                                jj = j;
+                            }
+                        }
+
+                    }
+                }
+
+                //onsole.log( "i="+ii );
+                //console.log( "j="+jj );                           
+                
+                // pzl[ii][jj];
+                if(ii-1>-1){
+                    if(pzl[ii-1][jj].order==9){
+                        //console.log("ii-1="+(ii-1));
+                        ctx.clearRect(pzl[ii][jj].dx,pzl[ii][jj].dy,pzl[ii][jj].dw,pzl[ii][jj].dh);
+
+                        ctx.drawImage(img,pzl[ii][jj].sx,pzl[ii][jj].sy,pzl[ii][jj].sw,pzl[ii][jj].sh,
+                                          pzl[ii-1][jj].dx,pzl[ii-1][jj].dy,pzl[ii-1][jj].dw,pzl[ii-1][jj].dh);
+
+                        temp.sx = pzl[ii][jj].sx
+                        pzl[ii][jj].sx = pzl[ii-1][jj].sx;
+                        pzl[ii-1][jj].sx = temp.sx;
+
+                        temp.sy = pzl[ii][jj].sy
+                        pzl[ii][jj].sy = pzl[ii-1][jj].sy;
+                        pzl[ii-1][jj].sy = temp.sy;
+
+                        temp.sw = pzl[ii][jj].sw;
+                        pzl[ii][jj].sw = pzl[ii-1][jj].sw;
+                        pzl[ii-1][jj].sw = temp.sw;
+
+                        temp.sh = pzl[ii][jj].sh;
+                        pzl[ii][jj].sh = pzl[ii-1][jj].sh;
+                        pzl[ii-1][jj].sh = temp.sh;
+
+                        temp.order = pzl[ii][jj].order;
+                        pzl[ii][jj].order = pzl[ii-1][jj].order;
+                        pzl[ii-1][jj].order = temp.order;
+
+                    }
+                }
+                if(ii+1<size){
+                    if(pzl[ii+1][jj].order==9){
+                        //console.log("ii+1="+(ii+1));
+                        ctx.clearRect(pzl[ii][jj].dx,pzl[ii][jj].dy,pzl[ii][jj].dw,pzl[ii][jj].dh);
+
+                        ctx.drawImage(img,pzl[ii][jj].sx,pzl[ii][jj].sy,pzl[ii][jj].sw,pzl[ii][jj].sh,
+                                          pzl[ii+1][jj].dx,pzl[ii+1][jj].dy,pzl[ii+1][jj].dw,pzl[ii+1][jj].dh);
+
+                        temp.sx = pzl[ii][jj].sx
+                        pzl[ii][jj].sx = pzl[ii+1][jj].sx;
+                        pzl[ii+1][jj].sx = temp.sx;
+
+                        temp.sy = pzl[ii][jj].sy
+                        pzl[ii][jj].sy = pzl[ii+1][jj].sy;
+                        pzl[ii+1][jj].sy = temp.sy;
+
+                        temp.sw = pzl[ii][jj].sw;
+                        pzl[ii][jj].sw = pzl[ii+1][jj].sw;
+                        pzl[ii+1][jj].sw = temp.sw;
+
+                        temp.sh = pzl[ii][jj].sh;
+                        pzl[ii][jj].sh = pzl[ii+1][jj].sh;
+                        pzl[ii+1][jj].sh = temp.sh;
+
+                        temp.order = pzl[ii][jj].order;
+                        pzl[ii][jj].order = pzl[ii+1][jj].order;
+                        pzl[ii+1][jj].order = temp.order;
+
+
+                    }
+
+                }
+                if(jj-1>-1){
+                    if(pzl[ii][jj-1].order==9){
+                        //console.log("jj-1="+(jj-1));
+                        ctx.clearRect(pzl[ii][jj].dx,pzl[ii][jj].dy,pzl[ii][jj].dw,pzl[ii][jj].dh);
+
+                        ctx.drawImage(img,pzl[ii][jj].sx,pzl[ii][jj].sy,pzl[ii][jj].sw,pzl[ii][jj].sh,
+                                          pzl[ii][jj-1].dx,pzl[ii][jj-1].dy,pzl[ii][jj-1].dw,pzl[ii][jj-1].dh);
+
+                        temp.sx = pzl[ii][jj].sx
+                        pzl[ii][jj].sx = pzl[ii][jj-1].sx;
+                        pzl[ii][jj-1].sx = temp.sx;
+
+                        temp.sy = pzl[ii][jj].sy
+                        pzl[ii][jj].sy = pzl[ii][jj-1].sy;
+                        pzl[ii][jj-1].sy = temp.sy;
+
+                        temp.sw = pzl[ii][jj].sw;
+                        pzl[ii][jj].sw = pzl[ii][jj-1].sw;
+                        pzl[ii][jj-1].sw = temp.sw;
+
+                        temp.sh = pzl[ii][jj].sh;
+                        pzl[ii][jj].sh = pzl[ii][jj-1].sh;
+                        pzl[ii][jj-1].sh = temp.sh;
+
+                        temp.order = pzl[ii][jj].order;
+                        pzl[ii][jj].order = pzl[ii][jj-1].order;
+                        pzl[ii][jj-1].order = temp.order;
+                    }
+                }
+                if(jj+1<size){
+                    if(pzl[ii][jj+1].order==9){
+                        //console.log("jj+1="+(jj+1));
+                        ctx.clearRect(pzl[ii][jj].dx,pzl[ii][jj].dy,pzl[ii][jj].dw,pzl[ii][jj].dh);
+
+                        ctx.drawImage(img,pzl[ii][jj].sx,pzl[ii][jj].sy,pzl[ii][jj].sw,pzl[ii][jj].sh,
+                                          pzl[ii][jj+1].dx,pzl[ii][jj+1].dy,pzl[ii][jj+1].dw,pzl[ii][jj+1].dh);
+                        
+                        temp.sx = pzl[ii][jj].sx
+                        pzl[ii][jj].sx = pzl[ii][jj+1].sx;
+                        pzl[ii][jj+1].sx = temp.sx;
+
+                        temp.sy = pzl[ii][jj].sy
+                        pzl[ii][jj].sy = pzl[ii][jj+1].sy;
+                        pzl[ii][jj+1].sy = temp.sy;
+
+                        temp.sw = pzl[ii][jj].sw;
+                        pzl[ii][jj].sw = pzl[ii][jj+1].sw;
+                        pzl[ii][jj+1].sw = temp.sw;
+
+                        temp.sh = pzl[ii][jj].sh;
+                        pzl[ii][jj].sh = pzl[ii][jj+1].sh;
+                        pzl[ii][jj+1].sh = temp.sh;
+
+
+                        temp.order = pzl[ii][jj].order;
+                        pzl[ii][jj].order = pzl[ii][jj+1].order;
+                        pzl[ii][jj+1].order = temp.order;
+
+                    }
+
+                }
+                var cnt=1;
+                var flag=0;
+                for(var i=0;i<size;i++){
+                    for(var j=0;j<size;j++){
+                        if(pzl[i][j].order==cnt){
+                            cnt++;
+                        }
+                    }
+                }
+                console.log(cnt);
+                if(cnt-1==size*size){
+                    alert("clear");
+                }
+            });
+        }
+
+        function getMouseClickPos(cvs,evt){
+            var rect = cvs.getBoundingClientRect();
+            return{
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            }
+        }
+
+        function change(x1,y1,x2,y2,size){
+            if(x1==size-1 && y1==size-1) return;
+            if(x2==size-1 && y2==size-1) return;
+
+            var temp = new Object;
+            temp.sx = pzl[x1][y1].sx;
+            temp.sy = pzl[x1][y1].sy;
+            temp.sw = pzl[x1][y1].sw;
+            temp.sh = pzl[x1][y1].sh;
+            temp.order = pzl[x1][y1].order;
+
+            pzl[x1][y1].sy = pzl[x2][y2].sy;
+            pzl[x1][y1].sx = pzl[x2][y2].sx;
+            pzl[x1][y1].sw = pzl[x2][y2].sw;
+            pzl[x1][y1].sh = pzl[x2][y2].sh;
+            pzl[x1][y1].order = pzl[x2][y2].order;
+
+            pzl[x2][y2].sy = temp.sy;
+            pzl[x2][y2].sx = temp.sx;
+            pzl[x2][y2].sw = temp.sw;
+            pzl[x2][y2].sh = temp.sh;
+            pzl[x2][y2].order = temp.order;
+        }
+    </script>
+    </head>
+    <body>
+        <h1 style="color:blue;">Puzzle Game</h1>
+        <div class="plz">
+            <img id="scream" src="http://www.pty.moj.gov.tw/public/Attachment/842614362365.JPG" alt="The Scream" width="512" height="512">
+            <canvas id="canvas" width="512" height="512"></canvas>
+        </div>
+    </body>
+</html>
+
